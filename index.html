@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESDKUOBE</title>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom Styles that match the Neo-Brutalist Theme */
+        body {
+            background-color: #f0f0f0;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .font-archivo {
+            font-family: 'Archivo Black', sans-serif;
+        }
+
+        ::selection {
+            background-color: #FFDE00;
+            color: black;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Custom Icon Components (Replacements for lucide-react) ---
+        const GraduationCap = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        );
+        const FileText = ({ size }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+        );
+        const Clock = ({ size }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        );
+        const Search = ({ size, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        );
+        const CheckCircle = ({ size, strokeWidth }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        );
+        const Circle = ({ size, strokeWidth }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+        );
+
+        const CourseCatalog = () => {
+            const [selectedYear, setSelectedYear] = useState('All');
+            const [selectedStatus, setSelectedStatus] = useState('All');
+            const [searchQuery, setSearchQuery] = useState('');
+            const [isLoaded, setIsLoaded] = useState(false);
+
+            useEffect(() => {
+                setIsLoaded(true);
+            }, []);
+
+            // --- Course Data ---
+            const courseData = [
+                {
+                year: "First Year",
+                term: "First Term",
+                courses: [
+                    { code: "0521 10 ES 1101", title: "Introduction to Environmental Science", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 1103", title: "Physical Environment I", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 1104", title: "Physical Environment I Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 1111", title: "Biological Environment I", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 1112", title: "Biological Environment I Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0531 10 Chem 1151", title: "Chemistry in Environmental Science", status: "Core", credits: 3.0 },
+                    { code: "0531 10 Chem 1152", title: "Chemistry in Environmental Science Sessional", status: "Core", credits: 1.0 },
+                    { code: "0541 10 Math 1161", title: "Mathematics in Environmental Science", status: "Core", credits: 3.0 },
+                    { code: "0542 10 Stat 1163", title: "Statistics in Environmental Science", status: "Core", credits: 2.0 },
+                    { code: "0542 10 Stat 1164", title: "Statistics in Environmental Science Sessional", status: "Core", credits: 1.0 },
+                    { code: "0231 10 Eng 1191", title: "English", status: "Core", credits: 3.0 },
+                ]
+                },
+                {
+                year: "First Year",
+                term: "Second Term",
+                courses: [
+                    { code: "0521 10 ES 1203", title: "Physical Environment II", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 1204", title: "Physical Environment II Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 1211", title: "Biological Environment II", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 1212", title: "Biological Environment II Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 1213", title: "Environmental Microbiology", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 1214", title: "Environmental Microbiology Sessional", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 1250", title: "Viva-voce I", status: "Core", credits: 1.0 },
+                    { code: "0610 10 CSE 1254", title: "Basic Computer Skill and Programming", status: "Optional", credits: 3.0 },
+                    { code: "0533 10 Phy 1271", title: "Physics in Environmental Science", status: "Core", credits: 3.0 },
+                    { code: "0533 10 Phy 1272", title: "Physics in Environmental Science Sessional", status: "Core", credits: 1.0 },
+                ]
+                },
+                {
+                year: "Second Year",
+                term: "First Term",
+                courses: [
+                    { code: "0521 10 ES 2103", title: "Hydrology", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 2104", title: "Hydrology Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 2105", title: "Environmental Chemistry", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 2111", title: "Principles of Ecology", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 2113", title: "Biodiversity", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 2114", title: "Biodiversity Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 2115", title: "Biochemistry in Environmental Science", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 2116", title: "Biochemistry in Environmental Science Sessional", status: "Core", credits: 1.0 },
+                    { code: "0311 10 Econ 2181", title: "Economics", status: "Core", credits: 3.0 },
+                    { code: "0314 10 Soc 2183", title: "Sociology", status: "Core", credits: 3.0 },
+                ]
+                },
+                {
+                year: "Second Year",
+                term: "Second Term",
+                courses: [
+                    { code: "0521 10 ES 2203", title: "Soil Environment", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 2204", title: "Soil Environment Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 2205", title: "Surficial Processes and Landform", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 2206", title: "Surficial Processes and Landform Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 2209", title: "Atmospheric Pollution", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 2210", title: "Atmospheric Pollution Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 2211", title: "Applied Ecology", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 2213", title: "Agriculture and Environment", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 2214", title: "Agriculture and Environment Sessional and Fieldwork", status: "Optional", credits: 1.0 },
+                    { code: "0521 10 ES 2215", title: "Human Dimension in Environmental Management", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 2250", title: "Viva-voce II", status: "Core", credits: 1.0 },
+                    { code: "0541 10 Math 2261", title: "Numerical Methods", status: "Core", credits: 3.0 },
+                ]
+                },
+                {
+                year: "Third Year",
+                term: "First Term",
+                courses: [
+                    { code: "0521 10 ES 3107", title: "Energy and Environment", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 3108", title: "Energy and Environment Sessional", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 3109", title: "Aquatic Pollution", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 3110", title: "Aquatic Pollution Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 3111", title: "Environmental Toxicology", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 3113", title: "Biotechnology in Environmental Science", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 3115", title: "Industrial Ecology", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 3116", title: "Industrial Ecology Sessional and Fieldwork", status: "Optional", credits: 1.0 },
+                    { code: "0521 10 ES 3125", title: "Geographic Information System and Remote Sensing", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 3126", title: "Geographic Information System and Remote Sensing Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 3133", title: "Water and Wastewater Treatment", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 3134", title: "Water and Wastewater Treatment Sessional and Fieldwork", status: "Optional", credits: 1.0 },
+                    { code: "0311 10 Econ 3181", title: "Environmental Economics and Management", status: "Core", credits: 3.0 },
+                ]
+                },
+                {
+                year: "Third Year",
+                term: "Second Term",
+                courses: [
+                    { code: "0521 10 ES 3203", title: "Meteorology and Climate Change", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 3204", title: "Meteorology and Climate Change Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 3205", title: "Limnology and Oceanography in Environmental Science", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 3206", title: "Limnology and Oceanography in Environmental Science Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 3219", title: "Research Methodology", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 3220", title: "Research Methodology Sessional", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 3221", title: "Natural Hazards and Disaster Management", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 3223", title: "Natural Resource Management", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 3225", title: "Water Resources Planning and Management", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 3250", title: "Viva-voce III", status: "Core", credits: 1.0 },
+                    { code: "0731 10 Arch 3251", title: "Landscape Ecology and Planning", status: "Core", credits: 3.0 },
+                ]
+                },
+                {
+                year: "Fourth Year",
+                term: "First Term",
+                courses: [
+                    { code: "0521 10 ES 4109", title: "Pollution Biology", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 4111", title: "Occupational Health and Safety", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 4112", title: "Occupational Health and Safety Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 4113", title: "Epidemiology", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 4121", title: "Coastal Environment and Management", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 4123", title: "Waste Management", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 4124", title: "Waste Management Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 4125", title: "Land Resources Planning and Management", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 4131", title: "Environmental System Analysis", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 4140", title: "Proposal Development", status: "Core", credits: 2.0 },
+                    { code: "0731 10 ES 4155", title: "Urbanization and Environment", status: "Core", credits: 2.0 },
+                    { code: "0731 10 ES 4156", title: "Urbanization and Environment Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                ]
+                },
+                {
+                year: "Fourth Year",
+                term: "Second Term",
+                courses: [
+                    { code: "0521 10 ES 4219", title: "Demography and Environment", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 4221", title: "Environmental Impact Assessment", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 4222", title: "Environmental Impact Assessment Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 4223", title: "Environmental Policy, Law and Protocols", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 4225", title: "Environmental Auditing", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 4226", title: "Environmental Auditing Sessional and Fieldwork", status: "Core", credits: 1.0 },
+                    { code: "0521 10 ES 4227", title: "Environmental Ethics", status: "Core", credits: 2.0 },
+                    { code: "0521 10 ES 4237", title: "Environmental Modelling", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 4238", title: "Environmental Modelling Sessional", status: "Optional", credits: 1.0 },
+                    { code: "0521 10 ES 4239", title: "Technologies in Pollution Control", status: "Optional", credits: 2.0 },
+                    { code: "0521 10 ES 4240", title: "Thesis", status: "Core", credits: 3.0 },
+                    { code: "0521 10 ES 4250", title: "Viva-voce IV", status: "Core", credits: 1.0 },
+                    { code: "0731 10 Arch 4251", title: "Environmental Planning and Design", status: "Optional", credits: 2.0 },
+                ]
+                },
+            ];
+
+            // Logic to filter data based on year, search query AND status
+            const getFilteredData = () => {
+                // 1. Filter by Year Selector (Semester level)
+                let data = selectedYear === 'All'
+                ? courseData
+                : courseData.filter(term => term.year === selectedYear);
+
+                // 2. Filter by Search Query AND Status (Course level)
+                data = data.map(term => ({
+                ...term,
+                courses: term.courses.filter(c => {
+                    const matchesSearch = !searchQuery.trim() || 
+                    c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.code.toLowerCase().includes(searchQuery.toLowerCase());
+                    
+                    const matchesStatus = selectedStatus === 'All' || c.status === selectedStatus;
+
+                    return matchesSearch && matchesStatus;
+                })
+                })).filter(term => term.courses.length > 0); // Remove terms that have 0 courses after filtering
+
+                return data;
+            };
+
+            const filteredData = getFilteredData();
+
+            // Calculate totals based on filtered data
+            const totalCourses = filteredData.reduce((acc, term) => acc + term.courses.length, 0);
+            const totalCredits = filteredData.reduce((acc, term) => acc + term.courses.reduce((cAcc, course) => cAcc + course.credits, 0), 0);
+
+            const years = ['All', 'First Year', 'Second Year', 'Third Year', 'Fourth Year'];
+            const statuses = ['All', 'Core', 'Optional'];
+
+            return (
+                <div className="min-h-screen bg-[#f0f0f0] font-sans selection:bg-[#FFDE00] selection:text-black">
+                {/* Background Pattern */}
+                <div 
+                    className="fixed inset-0 z-0 opacity-10 pointer-events-none"
+                    style={{
+                    backgroundImage: 'radial-gradient(#000 1px, transparent 1px)',
+                    backgroundSize: '20px 20px'
+                    }}
+                ></div>
+
+                {/* Marquee Header */}
+                <div className="bg-black text-[#FFDE00] py-3 overflow-hidden border-b-4 border-black relative z-10">
+                    <div className="animate-marquee whitespace-nowrap font-mono font-bold text-lg">
+                    ENVIRONMENTAL SCIENCE DISCIPLINE • KHULNA UNIVERSITY • OBE CURRICULUM • ACADEMIC SESSION 2022-2023 • ENVIRONMENTAL SCIENCE DISCIPLINE • KHULNA UNIVERSITY • OBE CURRICULUM • ACADEMIC SESSION 2022-2023
+                    </div>
+                </div>
+
+                <div className="relative z-10 max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+                    
+                    {/* Main Title Section */}
+                    <div className="mb-8 text-center transform transition-all hover:scale-[1.01] duration-300">
+                    <div className="inline-block bg-[#FFDE00] border-4 border-black shadow-[8px_8px_0px_0px_#000] p-6 mb-4">
+                        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-black mb-2 font-archivo">
+                        OBE Curriculum
+                        </h1>
+                        <p className="font-mono font-bold text-lg md:text-xl">
+                        Environmental Science Discipline
+                        </p>
+                    </div>
+                    </div>
+
+                    {/* Dashboard Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 max-w-4xl mx-auto">
+                    {/* Total Courses Card */}
+                    <div className="bg-[#54a0ff] border-4 border-black shadow-[8px_8px_0px_0px_#000] p-6 flex flex-col items-center justify-center transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_0px_#000] transition-all duration-200">
+                        <span className="font-mono font-bold text-lg mb-2 text-white">TOTAL COURSES</span>
+                        <span className="font-archivo text-6xl text-white tracking-tighter">{totalCourses}</span>
+                    </div>
+                    
+                    {/* Total Credits Card */}
+                    <div className="bg-[#FFDE00] border-4 border-black shadow-[8px_8px_0px_0px_#000] p-6 flex flex-col items-center justify-center transform hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_0px_#000] transition-all duration-200">
+                        <span className="font-mono font-bold text-lg mb-2 text-black">TOTAL CREDITS</span>
+                        <span className="font-archivo text-6xl text-black tracking-tighter">{totalCredits.toFixed(1)}</span>
+                    </div>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="max-w-2xl mx-auto mb-8 relative">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search courses by code or title..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-white border-4 border-black p-4 pl-12 font-mono text-lg shadow-[6px_6px_0px_0px_#000] focus:shadow-[4px_4px_0px_0px_#000] focus:translate-x-[2px] focus:translate-y-[2px] transition-all outline-none placeholder:text-gray-400"
+                            />
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black pointer-events-none" size={24} />
+                        </div>
+                    </div>
+
+                    {/* Status Filter Controls */}
+                    <div className="flex flex-col items-center mb-8 gap-3">
+                    <label className="font-mono font-bold text-sm bg-black text-white px-2 py-1">FILTER BY STATUS</label>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        {statuses.map((status) => (
+                        <button
+                            key={status}
+                            onClick={() => setSelectedStatus(status)}
+                            className={`
+                            px-5 py-2 font-bold font-mono text-sm border-4 border-black transition-all duration-100 flex items-center gap-2
+                            ${selectedStatus === status 
+                                ? 'bg-[#FFDE00] text-black shadow-[2px_2px_0px_0px_#000] translate-x-[2px] translate-y-[2px]' 
+                                : 'bg-white text-gray-500 shadow-[4px_4px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0px_0px_#000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none'
+                            }
+                            `}
+                        >
+                            {selectedStatus === status ? <CheckCircle size={16} strokeWidth={3} /> : <Circle size={16} strokeWidth={3} />}
+                            {status.toUpperCase()}
+                        </button>
+                        ))}
+                    </div>
+                    </div>
+
+                    {/* Year Filter Controls */}
+                    <div className="flex flex-col items-center mb-12 gap-3">
+                        <label className="font-mono font-bold text-sm bg-black text-white px-2 py-1">FILTER BY YEAR</label>
+                        <div className="flex flex-wrap justify-center gap-4">
+                        {years.map((year) => (
+                            <button
+                            key={year}
+                            onClick={() => setSelectedYear(year)}
+                            className={`
+                                px-6 py-3 font-bold font-mono text-sm md:text-base border-4 border-black transition-all duration-100
+                                ${selectedYear === year 
+                                ? 'bg-[#54a0ff] text-white shadow-[2px_2px_0px_0px_#000] translate-x-[4px] translate-y-[4px]' 
+                                : 'bg-white text-black shadow-[6px_6px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0px_0px_#000] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none'
+                                }
+                            `}
+                            >
+                            {year.toUpperCase()}
+                            </button>
+                        ))}
+                        </div>
+                    </div>
+
+                    {/* Course Grid */}
+                    <div className="grid grid-cols-1 gap-12">
+                    {filteredData.length > 0 ? (
+                        filteredData.map((semester, index) => (
+                        <div 
+                            key={`${semester.year}-${semester.term}`}
+                            className={`
+                            bg-white border-4 border-black shadow-[12px_12px_0px_0px_#000] p-0 overflow-hidden
+                            transform transition-all duration-500
+                            ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}
+                            `}
+                            style={{ transitionDelay: `${index * 100}ms` }}
+                        >
+                            {/* Card Header */}
+                            <div className="bg-black text-white p-4 border-b-4 border-black flex justify-between items-center">
+                            <h2 className="text-2xl font-black uppercase font-archivo tracking-tight">
+                                <span className="text-[#FFDE00]">{semester.year}</span> <span className="text-[#54a0ff]">/</span> {semester.term}
+                            </h2>
+                            <GraduationCap className="text-[#54a0ff] w-8 h-8" />
+                            </div>
+
+                            {/* Course List */}
+                            <div className="divide-y-4 divide-black">
+                            {semester.courses.map((course, idx) => (
+                                <div 
+                                key={course.code}
+                                className="group flex flex-col md:flex-row md:items-center justify-between p-4 hover:bg-[#fff9c4] transition-colors duration-200"
+                                >
+                                {/* Course Code & Title */}
+                                <div className="flex-1 mb-2 md:mb-0">
+                                    <div className="flex items-start gap-3">
+                                    <div className="bg-black text-white font-mono text-xs px-2 py-1 mt-1 shrink-0">
+                                        {course.code}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg leading-tight group-hover:underline decoration-4 underline-offset-4 decoration-[#54a0ff]">
+                                        {course.title}
+                                        </h3>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                {/* Metadata Badges */}
+                                <div className="flex flex-wrap items-center gap-3 mt-2 md:mt-0 md:ml-4 shrink-0 font-mono text-sm">
+                                    <div className={`
+                                    flex items-center gap-1 border-2 border-black px-3 py-1 font-bold
+                                    ${course.status === 'Core' ? 'bg-[#54a0ff] text-white' : 'bg-[#e0e0e0] text-black'}
+                                    `}>
+                                    <FileText size={14} />
+                                    {course.status.toUpperCase()}
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-1 bg-[#FFDE00] border-2 border-black px-3 py-1 font-bold text-black">
+                                    <Clock size={14} />
+                                    {course.credits} CR
+                                    </div>
+                                </div>
+                                </div>
+                            ))}
+                            </div>
+
+                            {/* Card Footer Summary */}
+                            <div className="bg-[#f0f0f0] p-4 border-t-4 border-black font-mono text-sm font-bold flex justify-between items-center">
+                            <span>TOTAL COURSES: {semester.courses.length}</span>
+                            <span>TOTAL CREDITS: {semester.courses.reduce((acc, curr) => acc + curr.credits, 0).toFixed(1)}</span>
+                            </div>
+                        </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-20 bg-white border-4 border-black shadow-[12px_12px_0px_0px_#000]">
+                            <h3 className="text-2xl font-black font-archivo mb-2">NO COURSES FOUND</h3>
+                            <p className="font-mono text-gray-500">Try adjusting your search or filters.</p>
+                        </div>
+                    )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-20 text-center font-mono font-bold text-sm text-gray-500 mb-8">
+                    <p>© 2025 Nazeef 251004</p>
+                    
+                    </div>
+
+                </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CourseCatalog />);
+    </script>
+</body>
+</html>
